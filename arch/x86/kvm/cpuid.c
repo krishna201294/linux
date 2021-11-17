@@ -1233,13 +1233,30 @@ EXPORT_SYMBOL_GPL(kvm_cpuid);
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
 	u32 eax, ebx, ecx, edx;
+	extern u32 total_exits;      
+	extern atomic64_t total_time;
+
+	
 
 	if (cpuid_fault_enabled(vcpu) && !kvm_require_cpl(vcpu, 0))
 		return 1;
 
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
-	kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
+	
+	if (eax == 0x4ffffffff){
+		eax = total_exits;
+		//print("total exits given", eax);
+	}
+	else if(eax == 0x4ffffffe) {
+		ebx =  (atomic64_read(&total_time)) >> 32;
+		//print("Higher 32-bits - EBX", ebx);
+		ecx =  (atomic64_read(&total_time)) & 0xffffffff;
+		//print("Lower 32-bits - ECX", ecx);	
+	}
+	else { 
+		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
+	}
 	kvm_rax_write(vcpu, eax);
 	kvm_rbx_write(vcpu, ebx);
 	kvm_rcx_write(vcpu, ecx);
