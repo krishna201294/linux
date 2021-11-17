@@ -28,8 +28,6 @@
 #include <linux/tboot.h>
 #include <linux/trace_events.h>
 #include <linux/entry-kvm.h>
-
-#include <asm/intrinsics.h>
 #include <asm/apic.h>
 #include <asm/asm.h>
 #include <asm/cpu.h>
@@ -6096,26 +6094,35 @@ unexpected_vmexit:
 	return 0;
 }
 
-atomic64_t total_time;
-
+u64 total_time=0;
 static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 {
-	atomic64_t start_time = rdtsc();
 	int ret = __vmx_handle_exit(vcpu, exit_fastpath);
-
+	u64 start_time; //= rdtsc();
+        u64 delta;
+        u64 end_time;
+        start_time = rdtsc();
+	total_time++;
 	/*
 	 * Exit to user space when bus lock detected to inform that there is
 	 * a bus lock in guest.
 	 */
+	
 	if (to_vmx(vcpu)->exit_reason.bus_lock_detected) {
 		if (ret > 0)
 			vcpu->run->exit_reason = KVM_EXIT_X86_BUS_LOCK;
 
 		vcpu->run->flags |= KVM_RUN_X86_BUS_LOCK;
-		atomic64_add(rdtsc() - start_time, &total_time);
+		end_time = rdtsc();
+		delta = end_time - start_time;
+		total_time += delta;
 		return 0;
 	}
+
 	//atomic64_add(rdtsc() - start_time, &total_time);
+	end_time = rdtsc();
+	delta = end_time - start_time;
+	total_time += delta;
 	return ret;
 }
 
