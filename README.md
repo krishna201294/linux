@@ -131,7 +131,7 @@ The <b>output</b> of the file executed in this lab can be found at the following
 
 All the work done above was reviewed by each other in order to proceed further.
 
-<h2># Steps #<h2>
+# Steps
 
 Took up 1st Question: For CPUID leaf node %eax=0x4FFFFFFF:
 Return the total number of exits (all types) in %eax <br>
