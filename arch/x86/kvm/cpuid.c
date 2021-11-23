@@ -24,7 +24,6 @@
 #include "mmu.h"
 #include "trace.h"
 #include "pmu.h"
-
 /*
  * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't need to be
  * aligned to sizeof(unsigned long) because it's not accessed via bitops.
@@ -1229,30 +1228,32 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 	return exact;
 }
 EXPORT_SYMBOL_GPL(kvm_cpuid);
+atomic_t total_exits = ATOMIC_INIT(0);
+atomic64_t total_time_spent = ATOMIC_INIT(0);
+EXPORT_SYMBOL(total_exits);
+EXPORT_SYMBOL(total_time_spent);
 
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
 	u32 eax, ebx, ecx, edx;
-	extern u32 total_exits;      
-	//extern atomic64_t total_time;
-
-	
+	uint64_t ct;
 
 	if (cpuid_fault_enabled(vcpu) && !kvm_require_cpl(vcpu, 0))
 		return 1;
 
 	eax = kvm_rax_read(vcpu);
 	ecx = kvm_rcx_read(vcpu);
-	
-	if (eax == 0x4ffffffff){
-		eax = total_exits;
-		//print("total exits given", eax);
+	if (eax == 0x4fffffff){
+		eax = arch_atomic_read(&total_exits);
+		printk(KERN_INFO "Number of exits %u",eax);
 	}
 	else if(eax == 0x4ffffffe) {
-		ebx =  0;//(atomic64_read(&total_time)) >> 32;
-		//print("Higher 32-bits - EBX", ebx);
-		ecx =  0;//(atomic64_read(&total_time)) & 0xffffffff;
-		//print("Lower 32-bits - ECX", ecx);	
+		printk(KERN_INFO "CPUID(0x4FFFFFFE), exit number=");
+		ct = atomic64_read(&total_time_spent);
+		ebx = (u32)(ct >> 32);
+		printk(KERN_INFO "EBX Register Higher 32-bits %u", ebx);
+		ecx = (u32)ct;
+	        printk(KERN_INFO "ECX Register Lower 32-bits  %u", ecx);	
 	}
 	else { 
 		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);

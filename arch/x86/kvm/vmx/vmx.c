@@ -5916,8 +5916,7 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
 		       vmcs_read16(VIRTUAL_PROCESSOR_ID));
 }
 
-u32 total_exits;
-
+extern atomic_t total_exits;
 /*
  * The guest has exited.  See if we can fix it or if we need userspace
  * assistance.
@@ -5929,8 +5928,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	u32 vectoring_info = vmx->idt_vectoring_info;
 	 
 	u16 exit_handler_index;
-	total_exits++;
-	
+	arch_atomic_inc(&total_exits);
+
 	/*
 	 * Flush logged GPAs PML buffer, this will make dirty_bitmap more
 	 * updated. Another good is, in kvm_vm_ioctl_get_dirty_log, before
@@ -6094,15 +6093,11 @@ unexpected_vmexit:
 	return 0;
 }
 
-u64 total_time=0;
+extern atomic64_t total_time_spent;
 static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 {
+	uint64_t start_time = rdtsc(); 
 	int ret = __vmx_handle_exit(vcpu, exit_fastpath);
-	u64 start_time; //= rdtsc();
-        u64 delta;
-        u64 end_time;
-        start_time = rdtsc();
-	total_time++;
 	/*
 	 * Exit to user space when bus lock detected to inform that there is
 	 * a bus lock in guest.
@@ -6113,16 +6108,11 @@ static int vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 			vcpu->run->exit_reason = KVM_EXIT_X86_BUS_LOCK;
 
 		vcpu->run->flags |= KVM_RUN_X86_BUS_LOCK;
-		end_time = rdtsc();
-		delta = end_time - start_time;
-		total_time += delta;
+		arch_atomic64_add(rdtsc() - start_time, &total_time_spent);
 		return 0;
 	}
 
-	//atomic64_add(rdtsc() - start_time, &total_time);
-	end_time = rdtsc();
-	delta = end_time - start_time;
-	total_time += delta;
+	arch_atomic64_add(rdtsc() - start_time, &total_time_spent);
 	return ret;
 }
 
