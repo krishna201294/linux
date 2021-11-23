@@ -116,4 +116,132 @@ https://cloud.google.com/compute/docs/instances/nested-virtualization/overview
 The <b>output</b> of the file executed in this lab can be found at the following below path
 
 <b> https://github.com/krishna201294/linux/blob/master/cmpe283/assignment1/output.txt </b>
+
+
+
+
+# Assignment 2 - Instrumentation Via Hypercall
+
+# Contributions
+1. Krishnaa - <br>
+    Investigated on setting up nested VM on Google compute engine and debugging and fixing script changes
+   
+2. Radhika - <br>
+    Investigated on the libraries to identify and store timestamp counters and increment counters
+
+All the work done above was reviewed by each other in order to proceed further.
+
+**#Steps**
+
+Took up 1st: For CPUID leaf node %eax=0x4FFFFFFF:
+Return the total number of exits (all types) in %eax
+
+
+Defined a variable total_exits of type u64 in cpuid.c and exported it in vmx.c.
+Checked condition if eax == 0x4fffffffff, then store the total_exits in %eax.
+In the vmx.c, each time the above condition is true, the value of total_exits is incremented by 1.
+		
+Took up 4th:  (For CPUID leaf node %eax=0x4FFFFFFE:
+Return the high 32 bits of the total time spent processing all exits in %ebx
+Return the low 32 bits of the total time spent processing all exits in %ecx 
+%ebx and %ecx return values are measured in processor cycles, across all VCPUs) :
+
+In the vmx.c file in arch/x86/kvm/vmx/, we made changes to the __vmx_handle_exit function.
+Defined an exit_handler_index of type u16 in vmx.c which takes up the input of the number and stores it in %ecx.
+Also defined total_cycle_time of the type atomic64_t in cpuid.c and exported it to vmx.c.
+Defined 2 variables, start_time and end_time and stored the value of rdtsc() in start time.
+In the function atomic_fetch_add(), passed the parameter of delta(end_time - start_time) and stored it in total_cycle_time.
+In cpuid.c, we checked the condition if eax == 0x4fffffffe, then we shift the high 32-bits in %ebx and low 32 bits in %ecx of total_time.
+
+5.	Now, we are required to make a VM. In order to get gcloud on our desktop, we need to install packages defined below using the following commands :
+
+	<br>$ sudo apt-get update
+    <br>$ sudo apt-get upgrade
+    <br>$ sudo apt-get install gnome-shell
+    <br>$ sudo apt-get install ubuntu-gnome-desktop
+    <br>$ sudo apt-get install autocutsel
+    <br>$ sudo apt-get install gnome-core
+    <br>$ sudo apt-get install gnome-panel
+    <br>$ sudo apt-get install gnome-themes-standard
+
+
+6. Once done with all the installation, we installed tightvncserver using the below commands:
+
+	<br>$ sudo apt-get install tightvncserver
+    <br>$ touch ~/.Xresources
+
+<br>Then launch the server using “$ tightvncserver” command.
+
+7. After setting up password for the Ubuntu Desktop Virtual Machine, start up the code using the command :
+
+    <br>:~$ vim /home/username/.vnc/xstartup
+
+8. After the startup, we need to write a startup script, which is as follows :
+
+    <br>#!/bin/sh
+    <br>autocutsel -fork
+    <br>xrdb $HOME/.Xresources
+    <br>xsetroot -solid grey
+    <br>export XKL_XMODMAP_DISABLE=1
+    <br>export XDG_CURRENT_DESKTOP="GNOME-Flashback:Unity"
+    <br>export XDG_MENU_PREFIX="gnome-flashback-"
+    <br>unset DBUS_SESSION_BUS_ADDRESS
+    <br>gnome-session --session=gnome-flashback-metacity --disable-acceleration-check --debug &
+
+9. Kill the process using ‘$ vncserver -kill :1’ and restart the server ‘$ vncserver -geometry 1024x640’
+
+10. Install google cloud SDK using this link.
+
+11. Once google cloud sdk is installed, we wrote the below command on the local terminal to connect to your current Google cloud instance :
+
+	<br> $ gcloud compute ssh \
+    <br>YOUR INSTANCE NAME HERE \
+    <br>--project YOUR PROJECT NAME HERE \
+    <br>--zone YOUR TIMEZONE HERE \
+    <br>--ssh-flag "-L 5901:localhost:5901"
+
+12. Using any remote desktop tool we can connect now to the vm using the public ip
+
+13. Now in the host VM in the remote desktop, we need to install the following packages and execute the commands.
+
+	<br>sudo apt-get update
+	<br>sudo apt-get install -y xrdp
+	<br>sudo apt-get install -y xfce4
+	<br>sudo service xrdp restart
+
+
+14. After executing the above commands, the host VM is eligible for nested VM. We installed a nested VM with ubuntu 20.04 using the live-server disk image -ubuntu-20.04.3-live-server-amd64.iso
+
+    <br>Install cpuid package in the nested VM using the command 
+    <br>$ apt install cpuid
+    
+    <img width="1436" alt="nestedVM1" src="https://user-images.githubusercontent.com/78173506/142967996-cf26e682-c049-4233-9169-56b06660f852.png">
+    
+    <img width="1247" alt="nestedVM2" src="https://user-images.githubusercontent.com/78173506/142968166-fe519853-b400-4fdd-b408-3e0fd3d602aa.png">
+
+
+
+
+15. We then ran our test script in order to check our code. The output shows :
+
+    <br>**The total number of exits after each execution.**
+    
+    <img width="1257" alt="totalexits" src="https://user-images.githubusercontent.com/78173506/142967819-832a6ade-85dc-450f-989e-93b7462ae63e.png">
+
+
+    <br>**The total time after each execution for exits.**
+    
+    <img width="516" alt="totalcycletime" src="https://user-images.githubusercontent.com/78173506/142967871-2979865a-2d6f-417d-8d34-9cdf79135646.png">
+
+
+    <br>**The register output if we use the command “cpuid -l 0x4fffffff”** is shown below:
+
+    <img width="1306" alt="registeroutput" src="https://user-images.githubusercontent.com/78173506/142967903-e9d2afe5-193a-4d5a-ad5c-6143cfb6fe5f.png">
+
+    
+
+    
+
+
+
   
