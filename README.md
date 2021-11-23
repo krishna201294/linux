@@ -131,38 +131,38 @@ The <b>output</b> of the file executed in this lab can be found at the following
 
 All the work done above was reviewed by each other in order to proceed further.
 
-**#Steps**
+<h2># Steps #<h2>
 
-Took up 1st: For CPUID leaf node %eax=0x4FFFFFFF:
-Return the total number of exits (all types) in %eax
+Took up 1st Question: For CPUID leaf node %eax=0x4FFFFFFF:
+Return the total number of exits (all types) in %eax <br>
 
 
 Defined a variable total_exits of type u64 in cpuid.c and exported it in vmx.c.
 Checked condition if eax == 0x4fffffffff, then store the total_exits in %eax.
 In the vmx.c, each time the above condition is true, the value of total_exits is incremented by 1.
 		
-Took up 4th:  (For CPUID leaf node %eax=0x4FFFFFFE:
-Return the high 32 bits of the total time spent processing all exits in %ebx
-Return the low 32 bits of the total time spent processing all exits in %ecx 
-%ebx and %ecx return values are measured in processor cycles, across all VCPUs) :
+Took up 2nd question:  (For CPUID leaf node %eax=0x4FFFFFFE:
+<br>Return the high 32 bits of the total time spent processing all exits in %ebx
+<br>Return the low 32 bits of the total time spent processing all exits in %ecx 
+<br>%ebx and %ecx return values are measured in processor cycles, across all VCPUs) :
 
 In the vmx.c file in arch/x86/kvm/vmx/, we made changes to the __vmx_handle_exit function.
-Defined an exit_handler_index of type u16 in vmx.c which takes up the input of the number and stores it in %ecx.
-Also defined total_cycle_time of the type atomic64_t in cpuid.c and exported it to vmx.c.
-Defined 2 variables, start_time and end_time and stored the value of rdtsc() in start time.
-In the function atomic_fetch_add(), passed the parameter of delta(end_time - start_time) and stored it in total_cycle_time.
-In cpuid.c, we checked the condition if eax == 0x4fffffffe, then we shift the high 32-bits in %ebx and low 32 bits in %ecx of total_time.
+<br>Defined an exit_handler_index of type u16 in vmx.c which takes up the input of the number and stores it in %ecx.
+<br>Also defined total_cycle_time of the type atomic64_t in cpuid.c and exported it to vmx.c.
+<br>Defined 2 variables, start_time and end_time and stored the value of rdtsc() in start time.
+<br>In the function atomic_fetch_add(), passed the parameter of delta(end_time - start_time) and stored it in total_cycle_time.
+<br>In cpuid.c, we checked the condition if eax == 0x4fffffffe, then we shift the high 32-bits in %ebx and low 32 bits in %ecx of total_time.
 
-5.	Now, we are required to make a VM. In order to get gcloud on our desktop, we need to install packages defined below using the following commands :
+5. Now, we are required to make a VM. In order to get gcloud on our desktop, we need to install packages defined below using the following commands :
 
 	<br>$ sudo apt-get update
-    <br>$ sudo apt-get upgrade
-    <br>$ sudo apt-get install gnome-shell
-    <br>$ sudo apt-get install ubuntu-gnome-desktop
-    <br>$ sudo apt-get install autocutsel
-    <br>$ sudo apt-get install gnome-core
-    <br>$ sudo apt-get install gnome-panel
-    <br>$ sudo apt-get install gnome-themes-standard
+    	<br>$ sudo apt-get upgrade
+    	<br>$ sudo apt-get install gnome-shell
+    	<br>$ sudo apt-get install ubuntu-gnome-desktop
+    	<br>$ sudo apt-get install autocutsel
+    	<br>$ sudo apt-get install gnome-core
+    	<br>$ sudo apt-get install gnome-panel
+    	<br>$ sudo apt-get install gnome-themes-standard
 
 
 6. Once done with all the installation, we installed tightvncserver using the below commands:
