@@ -5917,6 +5917,8 @@ void dump_vmcs(struct kvm_vcpu *vcpu)
 }
 
 extern atomic_t total_exits;
+extern atomic_t total_exits_per_code[69];
+extern atomic64_t total_time_spent_per_code[69];
 /*
  * The guest has exited.  See if we can fix it or if we need userspace
  * assistance.
@@ -5926,7 +5928,8 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 	struct vcpu_vmx *vmx = to_vmx(vcpu);
 	union vmx_exit_reason exit_reason = vmx->exit_reason;
 	u32 vectoring_info = vmx->idt_vectoring_info;
-	 
+	
+	uint64_t start_time = rdtsc();
 	u16 exit_handler_index;
 	arch_atomic_inc(&total_exits);
 
@@ -6074,9 +6077,11 @@ static int __vmx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t exit_fastpath)
 
 	exit_handler_index = array_index_nospec((u16)exit_reason.basic,
 						kvm_vmx_max_exit_handlers);
+	atomic_inc(&total_exits_per_code[(int)exit_handler_index]);
 	if (!kvm_vmx_exit_handlers[exit_handler_index])
 		goto unexpected_vmexit;
-	
+
+	arch_atomic64_add(rdtsc() - start_time, &total_time_spent_per_code[(int)exit_handler_index]);
 	return kvm_vmx_exit_handlers[exit_handler_index](vcpu);
 
 unexpected_vmexit:
@@ -6089,7 +6094,7 @@ unexpected_vmexit:
 	vcpu->run->internal.ndata = 2;
 	vcpu->run->internal.data[0] = exit_reason.full;
 	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-	
+	arch_atomic64_add(rdtsc() - start_time, &total_time_spent_per_code[(int)exit_handler_index]);
 	return 0;
 }
 

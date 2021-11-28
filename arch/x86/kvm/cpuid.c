@@ -1230,9 +1230,13 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
 EXPORT_SYMBOL_GPL(kvm_cpuid);
 atomic_t total_exits = ATOMIC_INIT(0);
 atomic64_t total_time_spent = ATOMIC_INIT(0);
+atomic_t total_exits_per_code[69];
+atomic64_t total_time_spent_per_code[69];
+
 EXPORT_SYMBOL(total_exits);
 EXPORT_SYMBOL(total_time_spent);
-
+EXPORT_SYMBOL(total_exits_per_code);
+EXPORT_SYMBOL(total_time_spent_per_code);
 int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 {
 	u32 eax, ebx, ecx, edx;
@@ -1248,13 +1252,55 @@ int kvm_emulate_cpuid(struct kvm_vcpu *vcpu)
 		printk(KERN_INFO "Number of exits %u",eax);
 	}
 	else if(eax == 0x4ffffffe) {
-		printk(KERN_INFO "CPUID(0x4FFFFFFE), exit number=");
+		printk(KERN_INFO "CPUID(0x4FFFFFFE)");
 		ct = atomic64_read(&total_time_spent);
 		ebx = (u32)(ct >> 32);
 		printk(KERN_INFO "EBX Register Higher 32-bits %u", ebx);
 		ecx = (u32)ct;
 	        printk(KERN_INFO "ECX Register Lower 32-bits  %u", ecx);	
 	}
+	else if(eax == 0x4ffffffd){
+		printk(KERN_INFO "CPUID(0x4FFFFFFD)");
+		if(ecx>69 || ecx<0 ||ecx==35 || ecx==38 || ecx==42 || ecx==65){
+			printk(KERN_INFO "SDM not supported !!");
+			eax = ebx = ecx = 0;
+			edx = 0xffffffff;
+		}
+		else if(ecx==5 || ecx==6 || ecx==11 || ecx==17 || ecx==35 || ecx==38 || ecx==42 || ecx==65 || ecx==66){
+			printk(KERN_INFO "KVM not supported !!");
+			eax = ebx = ecx = edx = 0;
+		}
+		else {
+			printk(KERN_INFO "EXIT Code passed from cli !! %u", ecx);
+			eax = atomic_read(&total_exits_per_code[ecx]);
+			printk(KERN_INFO "Count %u", eax);
+			//ebx = ecx = edx = 0;
+		}
+		
+	}
+	else if(eax == 0x4ffffffc){
+		printk(KERN_INFO "CPUID(0x4FFFFFFC)");
+		if(ecx>69 || ecx<0 ||ecx==35 || ecx==38 || ecx==42 || ecx==65){
+                        printk(KERN_INFO "SDM not supported !!");
+			eax = ebx = ecx = 0;
+                        edx = 0xffffffff;
+                }
+                else if(ecx==5 || ecx==6 || ecx==11 || ecx==17 || ecx==35 || ecx==38 || ecx==42 || ecx==65 || ecx==66){
+                        printk(KERN_INFO "KVM not supported !!");
+			eax = ebx = ecx = edx = 0;
+                }
+                else {
+			printk(KERN_INFO "EXIT Code passed from cli !! %u", ecx);
+			ct = atomic64_read(&total_time_spent_per_code[ecx]);
+			// printk(KERN_INFO "Count %u", total_time_spent_per_code[ecx]);
+			ebx = (u32)((ct >> 32) & 0xffffffff);
+                	ecx = (u32)ct&0xffffffff;
+			printk(KERN_INFO "EBX Register Higher 32-bits %u", ebx);
+                	printk(KERN_INFO "ECX Register Lower 32-bits  %u", ecx);
+                        edx = 0;
+                }
+	}
+
 	else { 
 		kvm_cpuid(vcpu, &eax, &ebx, &ecx, &edx, false);
 	}
