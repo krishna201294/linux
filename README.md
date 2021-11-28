@@ -236,4 +236,90 @@ All the work done above was reviewed by each other in order to proceed further.
 
     <img width="1306" alt="registeroutput" src="https://user-images.githubusercontent.com/78173506/142967903-e9d2afe5-193a-4d5a-ad5c-6143cfb6fe5f.png">
 
+
+
+
+# Assignment 3 - Instrumentation via Hypercall
+
+# Contributions
+1. Krishnaa - <br>
+    Made the necessary code changes for the total number of exits and the total time cycle for each exit. <br>
+    Added the required conditions for SDM and KVM exit codes.
+2. Radhika - <br>
+    Figured out the codes for which SDM and KVM gives out exits.
+    Recorded output for all the questions.
+
+All the work done above was reviewed by each other in order to proceed further and we debugged and traiaged issues in the process. We worked together in building the test script and making the below observations
+
+# Steps followed to make code changes
+1. Make necessary code changes in Cpuid.c or vmx.
+2. Compiled the code using the following command 
+	<br> <i> "make -j 8 modules" </i>
+3. Install the module packages <br> <i> "sudo make INSTALL_MOD_STRIP=1 modules_install" </i> 
+4. Stop the nested VM which is currently running
+5. On the host VM run the following commands
+      <br> <i> "rmmod kvm_intel" </i>
+      <br> <i> "rmmod kvm" </i>
+   This command removes the old binaries of the kvm
+6. Install the latest binaries using the below command
+      <br> <i> "modprobe kvm_intel" </i>
+      <br> <i> "modprobe kvm" </i>
+7. Start the nested VM
+8. Tail the dmesg logs using the command <br><i> dmesg -w </i></br>
+
+
+The screenshot below shows the number of exits for each exit code.
+<img width="856" alt="Screenshot1" src="https://user-images.githubusercontent.com/78173506/143724234-a09e4691-563d-4b87-bad1-e89ac54e96d4.png">
+
+<img width="878" alt="Screenshot2" src="https://user-images.githubusercontent.com/78173506/143724245-3fa6f4c1-e178-43fe-be1b-c2afa1e9457c.png">
+
+<img width="836" alt="Screenshot3" src="https://user-images.githubusercontent.com/78173506/143724249-bf44af4f-2223-4f85-a09a-2c28788facab.png">
+
+<img width="854" alt="Screenshot4" src="https://user-images.githubusercontent.com/78173506/143724254-50e9ef39-9e8b-4a25-8c20-103ef190eee9.png">
+
+<img width="857" alt="Screenshot5" src="https://user-images.githubusercontent.com/78173506/143724256-87e4b123-9914-4025-8b88-e50d285b8102.png">
+
+<img width="673" alt="Screenshot6" src="https://user-images.githubusercontent.com/78173506/143724266-d0131f1a-fad0-482b-8283-083cc17ddd7c.png">
+
+<img width="740" alt="Screenshot7" src="https://user-images.githubusercontent.com/78173506/143724267-2c067429-dacc-4a42-a1c5-3f2f9ac36263.png">
+
+<img width="739" alt="Screenshot8" src="https://user-images.githubusercontent.com/78173506/143724270-889e76df-38dc-4236-bed6-1d915fd5f278.png">
+
+<img width="797" alt="Screenshot9" src="https://user-images.githubusercontent.com/78173506/143724285-051acc98-5451-430e-9a41-cedfa7023ac0.png">
+
+<img width="819" alt="Screenshot10" src="https://user-images.githubusercontent.com/78173506/143724294-923d9e5a-ea78-451d-8815-086adaab1e61.png">
+
+
+The below 2 screenshots denote the rate of increase of exits for exit code = 10. 
+<img width="622" alt="Rate1" src="https://user-images.githubusercontent.com/78173506/143724300-19a41563-aae9-4ec2-9e3a-02a70ab565bc.png">
+
+<img width="411" alt="Rate2" src="https://user-images.githubusercontent.com/78173506/143724306-5d517a12-d3b9-4d2f-b315-e782a9a4e7fc.png">
+
+For 0x4ffffffd, before rebooting the count is as shown below. It is increasing by 50%. <br>
+<img width="407" alt="BeforeReboot" src="https://user-images.githubusercontent.com/78173506/143724322-85a82d4d-4543-424d-9271-70b3c8cc7e10.png">
+
+For 0x4ffffffd, after second rebooting the count is as shown below. It is increasing by 50%. <br>
+<img width="403" alt="SecondReboot" src="https://user-images.githubusercontent.com/78173506/143724326-0c045628-ef4d-44fb-a1a8-a429a85b0711.png">
+
+For 0x4ffffffd, after third rebooting the count is as shown below. It is increasing by 50%. <br>
+<img width="375" alt="ThirdReboot" src="https://user-images.githubusercontent.com/78173506/143724331-cb57d55b-d2e7-4558-8fb8-210f00fc6962.png">
+
+For 0x4ffffffc, the timeshift screenshots are attached below. We have attached only the ones that cause exit.
+<img width="459" alt="Timeshift_0" src="https://user-images.githubusercontent.com/78173506/143724341-aacf70c6-d84f-42ee-84c4-0b7cfff81bb1.png">
+
+<img width="519" alt="TimeShift" src="https://user-images.githubusercontent.com/78173506/143724336-edc9f798-ea88-4681-9b20-818d807e823f.png">
+
+Hexadecimal value of number of exits is passed in eax register shown below for 0x4ffffffd for exit code 10. 
+<img width="770" alt="Question3_Cli" src="https://user-images.githubusercontent.com/78173506/143724344-6e3a79e9-44af-4e9f-9832-d74e425ebe89.png">
+
+<img width="651" alt="Question4_cli" src="https://user-images.githubusercontent.com/78173506/143724350-02380881-1702-409d-8e26-34bb11666e85.png"><br>
+
+# Question 4
+
+The most frequent exit type is for exit code = 48. <br>
+The least frequent exit type is for exit code = 29.
+
+
+
+
     
