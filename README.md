@@ -243,12 +243,11 @@ All the work done above was reviewed by each other in order to proceed further.
 
 # Contributions
 1. Krishnaa - <br>
-    Setting up the Virtual Machine on Google Cloud with nested virtualization enabled <br>
-    Compiling the environment with latest Linux Kernel
-   
+    Made the necessary code changes for the total number of exits and the total time cycle for each exit. <br>
+    Added the required conditions for SDM and KVM exit codes.
 2. Radhika - <br>
-    Compiling default code on the VM <br>
-    Identifying MSR capabilities and relevant code changes and recording output
+    Figured out the codes for which SDM and KVM gives out exits.
+    Recorded output for all the questions.
 
 All the work done above was reviewed by each other in order to proceed further and we debugged and traiaged issues in the process. We worked together in building the test script and making the below observations
 
