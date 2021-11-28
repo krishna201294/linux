@@ -290,12 +290,13 @@ The screenshot below shows the number of exits for each exit code.
 <img width="819" alt="Screenshot10" src="https://user-images.githubusercontent.com/78173506/143724294-923d9e5a-ea78-451d-8815-086adaab1e61.png">
 
 
-The below 2 screenshots denote the rate of increase of exits for exit code = 10. 
+The below 2 screenshots denote the <b> rate of increase of exits for exit code = 10 for every 3 secs </b> 
+We noticed that the exit counts increased constantly at 74 throughout the 30 sec window.
 <img width="622" alt="Rate1" src="https://user-images.githubusercontent.com/78173506/143724300-19a41563-aae9-4ec2-9e3a-02a70ab565bc.png">
 
 <img width="411" alt="Rate2" src="https://user-images.githubusercontent.com/78173506/143724306-5d517a12-d3b9-4d2f-b315-e782a9a4e7fc.png">
 
-For 0x4ffffffd, before rebooting the count is as shown below. It is increasing by 50%. <br>
+For 0x4ffffffd, before rebooting the count is as shown below. <br>
 <img width="407" alt="BeforeReboot" src="https://user-images.githubusercontent.com/78173506/143724322-85a82d4d-4543-424d-9271-70b3c8cc7e10.png">
 
 For 0x4ffffffd, after second rebooting the count is as shown below. It is increasing by 50%. <br>
