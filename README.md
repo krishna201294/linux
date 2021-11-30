@@ -317,8 +317,9 @@ Hexadecimal value of number of exits is passed in eax register shown below for 0
 
 ## Question 4
 
-The most frequent exit type is for exit code = 48. <br>
-The least frequent exit type is for exit code = 29.
+The most frequent exit type is for exit code = 48 with the total exits as 384399 <br>
+The least frequent exit type is for exit code = 29 for which the total exits occured were 2.
+Also, a number of other exit types never occured and they recorded as 0 total exits.
 
 
 # Assignment 4 - Nested Paging vs. Shadow Paging
