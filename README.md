@@ -324,8 +324,16 @@ Also, a number of other exit types never occured and they recorded as 0 total ex
 
 # Assignment 4 - Nested Paging vs. Shadow Paging
 
-## Steps followed for the execution of the 4th assignment
-
+# Contributions
+1. Krishnaa - <br>
+    Ran the program with EPT = 0 and observed the results.
+2. Radhika - <br>
+    With EPT != 0, executed the code and made observations.
+    
+Discussed together to conclude about the observations made.
+    
+    
+## Observations for the 4th assignment
 
 
 <img width="629" alt="Screen Shot 2021-11-27 at 7 17 18 PM" src="https://user-images.githubusercontent.com/78173506/143727535-e9819b7e-4b4a-4dd9-b427-973d5f3101db.png">
@@ -334,6 +342,18 @@ Also, a number of other exit types never occured and they recorded as 0 total ex
 
 <img width="1440" alt="Comparisons2" src="https://user-images.githubusercontent.com/9292835/143727585-6846fe77-a789-4e66-b178-85f72a579f35.png">
 
+
+## Question 3
+
+## What did you learn from the count of exits? Was the count what you expected? If not, why not?
+
+In general, some of the exits are seen in both, nested paging and shadow paging. However, with EPT = 0 (Shadow Paging), the exit counts 0(NMI - Non-Maskable Interrupt), 14(INVLPG - Invalidate TLB Entries), 28(Control Register Access), 58(INVPCID - Invalidate Process Context Identifier) have a drastic increase. This is expected since with shadow paging enabled, there are two levels of address translations between the guest VM and the host VM. The exit type 28 (Control-register accesses) is way more often in shadow paging mode.
+
+## What changed between the two runs (ept vs non-ept)?
+
+<b>EPT : With EPT, the physical address of the visitor is obtained directly from the guest page table, while the physical address of the host is obtained automatically from the VMM mapping table resulting in fewer VM Exits</b>
+
+<b>NON_EPT</b> : Since shadow paging uses a two layer translation from guest physical address to host physical address, which induces more VM Exits due to VMM traps and TLB Flush. Also, shadow paging involves more memory utilization so it has to maintain two page tables.
 
 
 
