@@ -324,11 +324,16 @@ Also, a number of other exit types never occured and they recorded as 0 total ex
 
 # Assignment 4 - Nested Paging vs. Shadow Paging
 
+## Steps followed for the execution of the 4th assignment
+
+
+
 <img width="629" alt="Screen Shot 2021-11-27 at 7 17 18 PM" src="https://user-images.githubusercontent.com/78173506/143727535-e9819b7e-4b4a-4dd9-b427-973d5f3101db.png">
 
 <img width="1440" alt="Comparisons1" src="https://user-images.githubusercontent.com/9292835/143727584-b9b57ee7-04fb-4edd-9504-6b87b5dcd9b1.png">
 
 <img width="1440" alt="Comparisons2" src="https://user-images.githubusercontent.com/9292835/143727585-6846fe77-a789-4e66-b178-85f72a579f35.png">
+
 
 
 
