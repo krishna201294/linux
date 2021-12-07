@@ -351,7 +351,7 @@ In general, some of the exits are seen in both, nested paging and shadow paging.
 
 ## What changed between the two runs (ept vs non-ept)?
 
-<b>EPT : With EPT, the physical address of the visitor is obtained directly from the guest page table, while the physical address of the host is obtained automatically from the VMM mapping table resulting in fewer VM Exits</b>
+<b>EPT</b> : With EPT, the physical address of the visitor is obtained directly from the guest page table, while the physical address of the host is obtained automatically from the VMM mapping table resulting in fewer VM Exits
 
 <b>NON_EPT</b> : Since shadow paging uses a two layer translation from guest physical address to host physical address, which induces more VM Exits due to VMM traps and TLB Flush. Also, shadow paging involves more memory utilization so it has to maintain two page tables.
 
